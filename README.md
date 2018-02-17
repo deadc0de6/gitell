@@ -3,7 +3,24 @@
 
 # GITELL
 
-*Quickly get multiple git repositories state*
+*Quickly get multiple git repositories status*
+
+![](screenshots/screenshot1.png "gitell")
+
+# Usage
+
+Per default gitell will search for git repositories in the
+directories where it is called from.
+
+```
+$ ./gitell -h
+
+gitell [-v] [-d <depth>] [<path> ...]
+
+	-d <depth> 	Depth to search for git directories (default: 4).
+	-h		Print usage.
+	-v		Print version.
+```
 
 # Contribution
 
