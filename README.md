@@ -5,7 +5,7 @@
 
 *Quickly get multiple git repositories status*
 
-![](screenshots/screenshot1.png "gitell")
+![](screenshots/screenshot2.png "gitell")
 
 # Usage
 
