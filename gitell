@@ -69,7 +69,9 @@ branch_status()
 # $3 status
 output()
 {
-  echo -e "${c_blue}${1}${c_reset}/${2} ${3}"
+  br="${c_gray}${2}${c_reset}"
+  [ "${2}" = "master" ] && br="${2}"
+  echo -e "${c_blue}${1}${c_reset}/${br} ${3}"
 }
 
 # colors
@@ -79,6 +81,7 @@ c_yellow="\\e[33m"
 c_green="\\e[32m"
 c_red="\\e[31m"
 c_magenta="\\e[35m"
+c_gray="\\e[37m"
 
 # status
 st_clean="${c_green}clean${c_reset}"
@@ -95,7 +98,7 @@ depth="4"
 git_head_path="refs/heads"
 
 # usage
-usage="\\n$(basename ${0}) [-v] [-d <depth>] [<path> ...]"
+usage="\\n$(basename "${0}") [-v] [-d <depth>] [<path> ...]"
 usage="${usage}\\n"
 usage="${usage}\\n\\t-d <depth> \\tDepth to search for git directories (default: ${depth})."
 usage="${usage}\\n\\t-h\\t\\tPrint usage."
