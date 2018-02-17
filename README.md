@@ -7,6 +7,13 @@
 
 ![](screenshots/screenshot2.png "gitell")
 
+If you manage multiple git repositories and want to quickly get
+an overview of the status of those repositories, gitell can help.
+
+Either provide it with directories to search for git repos to
+inspect or run it directly from the location where all
+your gits are.
+
 # Usage
 
 Per default gitell will search for git repositories in the
