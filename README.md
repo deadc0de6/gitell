@@ -22,6 +22,14 @@ gitell [-v] [-d <depth>] [<path> ...]
 	-v		Print version.
 ```
 
+# Related projects
+
+These are similar projects that have inspired me for gitell:
+
+* [https://github.com/StreakyCobra/gws](https://github.com/StreakyCobra/gws)
+* [https://github.com/fboender/multi-git-status](https://github.com/fboender/multi-git-status)
+* [https://github.com/MirkoLedda/git-summary](https://github.com/MirkoLedda/git-summary)
+
 # Contribution
 
 If you are having trouble using gitell, open an issue.
