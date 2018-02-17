@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/deadc0de6/gitell.svg?branch=master)](https://travis-ci.org/deadc0de6/gitell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
+[![AUR](https://img.shields.io/aur/version/gitell-git.svg)](https://aur.archlinux.org/packages/gitell-git)
 
 # GITELL
 
@@ -28,6 +29,17 @@ gitell [-v] [-d <depth>] [<path> ...]
 	-h		Print usage.
 	-v		Print version.
 ```
+
+# Installation
+
+Clone the repository and copy `gitell` somewhere in your path.
+
+```
+git clone https://github.com/deadc0de6/gitell.git /tmp/gitell
+sudo cp /tmp/gitell/gitell /usr/bin/
+```
+
+Gitell is also available on [aur](https://aur.archlinux.org/packages/gitell-git/).
 
 # Related projects
 
