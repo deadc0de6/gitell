@@ -2,7 +2,7 @@
 # author: deadc0de6 (https://github.com/deadc0de6)
 # Copyright (c) 2018, deadc0de6
 
-# this retrieves the branches
+# retrieve the branches
 # that are tracking a remote
 #
 # $1: repository path
@@ -20,7 +20,7 @@ get_branches()
   branches=${branches%% }
 }
 
-# this format git-status XYs
+# format git-status XYs
 #
 # $1: repository path
 # $2: branch (format: local,remote)
@@ -44,7 +44,7 @@ get_status()
   [ "${nok}" != "" ] && status="${st_dirty} (${nok})"
 }
 
-# this parses a branch status from origin
+# parse a branch status from origin
 #
 # $1: repository
 # $2: branch (format: local,remote)
@@ -61,7 +61,7 @@ branch_status()
   [ "${behind}" -gt 0 ] && insync=false
 }
 
-# this outputs the result for a specific repo
+# output the result for a specific repo
 # on a specific branch
 #
 # $1 repo
@@ -94,12 +94,14 @@ paths="."
 depth="4"
 git_head_path="refs/heads"
 
-usage="${0} [-v] [-d <depth>] [<path> ...]"
+# usage
+usage="\\n$(basename ${0}) [-v] [-d <depth>] [<path> ...]"
 usage="${usage}\\n"
 usage="${usage}\\n\\t-d <depth> \\tDepth to search for git directories (default: ${depth})."
 usage="${usage}\\n\\t-h\\t\\tPrint usage."
 usage="${usage}\\n\\t-v\\t\\tPrint version."
 
+# parse arguments
 args="f:d:hv"
 while getopts ${args} arg; do
   case ${arg} in
@@ -108,7 +110,7 @@ while getopts ${args} arg; do
       ;;
     v)
       echo "$(basename "${0}") version ${version}"
-      echo "https://github.com/deadc0de6/TODO"
+      echo "https://github.com/deadc0de6/gitell"
       exit 0
       ;;
     h)
