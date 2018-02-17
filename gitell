@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+# author: deadc0de6 (https://github.com/deadc0de6)
+# Copyright (c) 2018, deadc0de6
+
+# this retrieves the branches
+# that are tracking a remote
+#
+# $1: repository path
+# stores the list in ${branches}
+get_branches()
+{
+  branches=""
+  brs=$(git -C "${1}" for-each-ref "${git_head_path}" --format='%(refname:short),%(upstream:short)' | xargs)
+  for br in ${brs}; do
+    loc=$(echo "${br}" | awk -F, '{print $1}')
+    rem=$(echo "${br}" | awk -F, '{print $2}')
+    [ "${rem}" != "" ] && branches="${branches}${br} "
+  done
+  # strip space
+  branches=${branches%% }
+}
+
+# this format git-status XYs
+#
+# $1: repository path
+# $2: branch (format: local,remote)
+# stores the string in ${status}
+get_status()
+{
+  changes=$(git -C "${1}" status --short | awk '{print $1}' | sort | uniq | xargs)
+  status="${st_clean}"
+  nok=""
+  for i in ${changes}; do
+    if [ "$i" = "??" ]; then
+      nok="${nok}${st_untracked} "
+    elif [ "$i" != "" ]; then
+      nok="${nok}${st_modified} "
+    fi
+  done
+  # strip space
+  branch_status "${1}" "${2}"
+  [ "${insync}" = false ] && nok="${nok}${st_sync} "
+  nok=${nok%% }
+  [ "${nok}" != "" ] && status="${st_dirty} (${nok})"
+}
+
+# this parses a branch status from origin
+#
+# $1: repository
+# $2: branch (format: local,remote)
+# stores true|false in insync
+branch_status()
+{
+  insync=true
+  loc=$(echo "${2}" | awk -F, '{print $1}')
+  rem=$(echo "${2}" | awk -F, '{print $2}')
+  cnts=$(git -C "${1}" rev-list --left-right --pretty=oneline --count "${loc}"..."${rem}")
+  ahead=$(echo "${cnts}" | awk '{print $1}')
+  behind=$(echo "${cnts}" | awk '{print $2}')
+  [ "${ahead}" -gt 0 ] && insync=false
+  [ "${behind}" -gt 0 ] && insync=false
+}
+
+# this outputs the result for a specific repo
+# on a specific branch
+#
+# $1 repo
+# $2 branch
+# $3 status
+output()
+{
+  echo -e "${c_blue}${1}${c_reset}/${2} ${3}"
+}
+
+# colors
+c_reset="\\e[0m"
+c_blue="\\e[34m"
+c_yellow="\\e[33m"
+c_green="\\e[32m"
+c_red="\\e[31m"
+c_magenta="\\e[35m"
+
+# status
+st_clean="${c_green}clean${c_reset}"
+st_dirty="${c_red}dirty${c_reset}"
+st_untracked="${c_yellow}untracked files${c_reset}"
+st_modified="${c_yellow}modified files${c_reset}"
+st_sync="${c_magenta}not in sync with origin${c_reset}"
+
+# global vars
+version="0.1"
+gitsub=".git"
+paths="."
+depth="4"
+git_head_path="refs/heads"
+
+usage="${0} [-v] [-d <depth>] [<path> ...]"
+usage="${usage}\\n"
+usage="${usage}\\n\\t-d <depth> \\tDepth to search for git directories (default: ${depth})."
+usage="${usage}\\n\\t-h\\t\\tPrint usage."
+usage="${usage}\\n\\t-v\\t\\tPrint version."
+
+args="f:d:hv"
+while getopts ${args} arg; do
+  case ${arg} in
+    d)
+      depth="${OPTARG}"
+      ;;
+    v)
+      echo "$(basename "${0}") version ${version}"
+      echo "https://github.com/deadc0de6/TODO"
+      exit 0
+      ;;
+    h)
+      echo -e "${usage}" && exit 0
+      ;;
+    *)
+      echo -e "${usage}" && exit 1
+      ;;
+  esac
+done
+shift "$((OPTIND - 1))"
+[ "$#" -gt 0 ] && [ "$*" != "" ] && paths="$*"
+
+# loop through all paths
+for path in ${paths}; do
+  # loop through all git repositories
+  find -L "${path}" -maxdepth "${depth}" -name "${gitsub}" -type d | while read -r g; do
+    p=$(dirname "${g}")
+    get_branches "${p}"
+    # loop through all branches
+    for b in ${branches}; do
+      get_status "${p}" "${b}"
+      loc=$(echo "${b}" | awk -F, '{print $1}')
+      output "${p}" "${loc}" "${status}"
+    done
+  done
+done
