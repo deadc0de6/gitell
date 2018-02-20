@@ -23,9 +23,10 @@ directories where it is called from.
 ```
 $ ./gitell -h
 
-gitell [-v] [-d <depth>] [<path> ...]
+gitell [-vs] [-d <depth>] [<path> ...]
 
 	-d <depth> 	Depth to search for git directories (default: 4).
+	-s		Use symbols instead of text.
 	-h		Print usage.
 	-v		Print version.
 ```
