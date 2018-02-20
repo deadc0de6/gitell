@@ -37,9 +37,9 @@ get_status()
       nok="${nok}${st_modified} "
     fi
   done
-  # strip space
   branch_status "${1}" "${2}"
   [ "${insync}" = false ] && nok="${nok}${st_sync} "
+  # strip space
   nok=${nok%% }
   [ "${nok}" != "" ] && status="${st_dirty} (${nok})"
 }
@@ -84,28 +84,29 @@ c_magenta="\\e[35m"
 c_gray="\\e[37m"
 
 # status
-st_clean="${c_green}clean${c_reset}"
-st_dirty="${c_red}dirty${c_reset}"
-st_untracked="${c_yellow}untracked files${c_reset}"
-st_modified="${c_yellow}modified files${c_reset}"
-st_sync="${c_magenta}not in sync with origin${c_reset}"
+t_clean="clean"
+t_dirty="dirty"
+t_untracked="untracked files"
+t_modified="modified files"
+t_sync="not in sync"
 
 # global vars
-version="0.1"
+version="0.2"
 gitsub=".git"
 paths="."
 depth="4"
 git_head_path="refs/heads"
 
 # usage
-usage="\\n$(basename "${0}") [-v] [-d <depth>] [<path> ...]"
+usage="\\n$(basename "${0}") [-vs] [-d <depth>] [<path> ...]"
 usage="${usage}\\n"
 usage="${usage}\\n\\t-d <depth> \\tDepth to search for git directories (default: ${depth})."
+usage="${usage}\\n\\t-s\\t\\tUse symbols instead of text."
 usage="${usage}\\n\\t-h\\t\\tPrint usage."
 usage="${usage}\\n\\t-v\\t\\tPrint version."
 
 # parse arguments
-args="f:d:hv"
+args="f:d:hvs"
 while getopts ${args} arg; do
   case ${arg} in
     d)
@@ -115,6 +116,13 @@ while getopts ${args} arg; do
       echo "$(basename "${0}") version ${version}"
       echo "https://github.com/deadc0de6/gitell"
       exit 0
+      ;;
+    s)
+      t_clean="[✔]"
+      t_dirty="[✘]"
+      t_untracked="*"
+      t_modified="+"
+      t_sync="⌁"
       ;;
     h)
       echo -e "${usage}" && exit 0
@@ -126,6 +134,13 @@ while getopts ${args} arg; do
 done
 shift "$((OPTIND - 1))"
 [ "$#" -gt 0 ] && [ "$*" != "" ] && paths="$*"
+
+# status
+st_clean="${c_green}${t_clean}${c_reset}"
+st_dirty="${c_red}${t_dirty}${c_reset}"
+st_untracked="${c_yellow}${t_untracked}${c_reset}"
+st_modified="${c_yellow}${t_modified}${c_reset}"
+st_sync="${c_magenta}${t_sync}${c_reset}"
 
 # loop through all paths
 for path in ${paths}; do
