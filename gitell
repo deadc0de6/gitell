@@ -91,7 +91,7 @@ t_modified="modified files"
 t_sync="not in sync"
 
 # global vars
-version="0.2"
+version="0.3"
 gitsub=".git"
 paths="."
 depth="4"
