@@ -10,50 +10,48 @@
 get_branches()
 {
   branches=""
-  brs=$(git -C "${1}" for-each-ref "${git_head_path}" --format='%(refname:short),%(upstream:short)' | xargs)
-  for br in ${brs}; do
-    loc=$(echo "${br}" | awk -F, '{print $1}')
-    rem=$(echo "${br}" | awk -F, '{print $2}')
-    [ "${rem}" != "" ] && branches="${branches}${br} "
-  done
-  # strip space
-  branches=${branches%% }
+  branches=$(git -C "${1}" for-each-ref "${git_head_path}" --format='%(refname:short)' | xargs)
+  curbranch=$(git -C "${1}" symbolic-ref -q HEAD)
+  curbranch=${curbranch#refs/heads/}
 }
 
 # format git-status XYs
 #
 # $1: repository path
-# $2: branch (format: local,remote)
+# $2: branch
+# $3: current branch
 # stores the string in ${status}
 get_status()
 {
-  changes=$(git -C "${1}" status --short | awk '{print $1}' | sort | uniq | xargs)
-  status="${st_clean}"
   nok=""
-  for i in ${changes}; do
-    if [ "$i" = "??" ]; then
-      nok="${nok}${st_untracked} "
-    elif [ "$i" != "" ]; then
-      nok="${nok}${st_modified} "
-    fi
-  done
+  status="${st_clean}"
+  if [ "${2}" = "${3}" ]; then
+    changes=$(git -C "${1}" status --short | awk '{print $1}' | sort | uniq | xargs)
+    for i in ${changes}; do
+      if [ "$i" = "??" ]; then
+        nok="${nok}${st_untracked}${sep}"
+      elif [ "$i" != "" ]; then
+        nok="${nok}${st_modified}${sep}"
+      fi
+    done
+  fi
   branch_status "${1}" "${2}"
-  [ "${insync}" = false ] && nok="${nok}${st_sync} "
+  [ "${insync}" = false ] && nok="${nok}${st_sync}${sep}"
   # strip space
-  nok=${nok%% }
+  nok=${nok%%${sep}}
   [ "${nok}" != "" ] && status="${st_dirty} (${nok})"
 }
 
 # parse a branch status from origin
 #
 # $1: repository
-# $2: branch (format: local,remote)
+# $2: branch
 # stores true|false in insync
 branch_status()
 {
   insync=true
-  loc=$(echo "${2}" | awk -F, '{print $1}')
-  rem=$(echo "${2}" | awk -F, '{print $2}')
+  loc=${2}
+  rem=$(git -C "${1}" config --get branch."${loc}".merge)
   cnts=$(git -C "${1}" rev-list --left-right --pretty=oneline --count "${loc}"..."${rem}")
   ahead=$(echo "${cnts}" | awk '{print $1}')
   behind=$(echo "${cnts}" | awk '{print $2}')
@@ -64,13 +62,15 @@ branch_status()
 # output the result for a specific repo
 # on a specific branch
 #
-# $1 repo
-# $2 branch
-# $3 status
+# $1: repo
+# $2: branch
+# $3: status
+# $4: current branch
 output()
 {
   br="${c_gray}${2}${c_reset}"
-  [ "${2}" = "master" ] && br="${2}"
+  # if current branch, in white
+  [ "${2}" = "${4}" ] && br="${2}"
   echo -e "${c_blue}${1}${c_reset}/${br} ${3}"
 }
 
@@ -96,6 +96,7 @@ gitsub=".git"
 paths="."
 depth="4"
 git_head_path="refs/heads"
+sep=","
 
 # usage
 usage="\\n$(basename "${0}") [-vs] [-d <depth>] [<path> ...]"
@@ -147,12 +148,13 @@ for path in ${paths}; do
   # loop through all git repositories
   find -L "${path}" -maxdepth "${depth}" -name "${gitsub}" -type d | while read -r g; do
     p=$(dirname "${g}")
+    # make sure we are in a git tree
+    git -C "${p}" rev-parse --is-inside-work-tree >/dev/null || continue
     get_branches "${p}"
     # loop through all branches
     for b in ${branches}; do
-      get_status "${p}" "${b}"
-      loc=$(echo "${b}" | awk -F, '{print $1}')
-      output "${p}" "${loc}" "${status}"
+      get_status "${p}" "${b}" "${curbranch}"
+      output "${p}" "${b}" "${status}" "${curbranch}"
     done
   done
 done
