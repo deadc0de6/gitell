@@ -40,7 +40,7 @@ git clone https://github.com/deadc0de6/gitell.git /tmp/gitell
 sudo cp /tmp/gitell/gitell /usr/bin/
 ```
 
-Gitell is also available on [aur](https://aur.archlinux.org/packages/gitell-git/).
+Gitell is also available on [aur](https://aur.archlinux.org/packages/gitell-git/): [gitell-git](https://aur.archlinux.org/packages/gitell-git/).
 
 # Related projects
 
