@@ -18,7 +18,7 @@ your gits are.
 # Usage
 
 Per default gitell will search for git repositories in the
-directories where it is called from.
+directory where it is called from.
 
 ```
 $ ./gitell -h
