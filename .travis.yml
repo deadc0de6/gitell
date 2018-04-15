@@ -6,4 +6,4 @@ addons:
     packages:
     - shellcheck
 script:
- - shellcheck ./gitell
+ - ./tests.sh
