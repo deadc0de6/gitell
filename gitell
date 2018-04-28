@@ -98,7 +98,7 @@ t_sync="not in sync"
 t_push="need push"
 
 # global vars
-version="0.4"
+version="0.5"
 gitsub=".git"
 paths="."
 depth="4"
