@@ -26,6 +26,7 @@ get_status()
   nok=""
   status="${st_clean}"
   if [ "${2}" = "${3}" ]; then
+    # get more info if it's the current branch
     changes=$(git -C "${1}" status --short | awk '{print $1}' | sort | uniq | xargs)
     for i in ${changes}; do
       if [ "$i" = "??" ]; then
@@ -34,6 +35,9 @@ get_status()
         nok="${nok}${st_modified}${sep}"
       fi
     done
+    # check if need push
+    changes=$(git -C "${1}" cherry -v | wc -l)
+    [ "${changes}" -gt "0" ] && nok="${nok}${st_push}${sep}"
   fi
   branch_status "${1}" "${2}"
   [ "${insync}" = false ] && nok="${nok}${st_sync}${sep}"
@@ -86,9 +90,12 @@ c_gray="\\e[37m"
 # status
 t_clean="clean"
 t_dirty="dirty"
+
+# status info
 t_untracked="untracked files"
 t_modified="modified files"
 t_sync="not in sync"
+t_push="need push"
 
 # global vars
 version="0.4"
@@ -124,6 +131,7 @@ while getopts ${args} arg; do
       t_untracked="*"
       t_modified="+"
       t_sync="⌁"
+      t_push="⇡"
       ;;
     h)
       echo -e "${usage}" && exit 0
@@ -142,6 +150,7 @@ st_dirty="${c_red}${t_dirty}${c_reset}"
 st_untracked="${c_yellow}${t_untracked}${c_reset}"
 st_modified="${c_yellow}${t_modified}${c_reset}"
 st_sync="${c_magenta}${t_sync}${c_reset}"
+st_push="${c_magenta}${t_push}${c_reset}"
 
 # loop through all paths
 for path in ${paths}; do
