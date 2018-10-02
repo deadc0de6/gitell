@@ -15,6 +15,7 @@ get_branches()
   curbranch=${curbranch#refs/heads/}
 }
 
+
 # format git-status XYs
 #
 # $1: repository path
@@ -36,8 +37,11 @@ get_status()
       fi
     done
     # check if need push
-    changes=$(git -C "${1}" cherry -v | wc -l)
-    [ "${changes}" -gt "0" ] && nok="${nok}${st_push}${sep}"
+    hasremote=$(git -C "${1}" ls-remote 2>/dev/null | grep -c "refs/heads/${2}")
+    if [ "${hasremote}" -gt 0 ]; then
+      changes=$(git -C "${1}" cherry -v | wc -l)
+      [ "${changes}" -gt "0" ] && nok="${nok}${st_push}${sep}"
+    fi
   fi
   branch_status "${1}" "${2}"
   [ "${insync}" = false ] && nok="${nok}${st_sync}${sep}"
@@ -59,8 +63,10 @@ branch_status()
   cnts=$(git -C "${1}" rev-list --left-right --pretty=oneline --count "${loc}"..."${rem}")
   ahead=$(echo "${cnts}" | awk '{print $1}')
   behind=$(echo "${cnts}" | awk '{print $2}')
+  hasremote=$(git -C "${1}" ls-remote 2>/dev/null | grep -c "refs/heads/${2}")
   [ "${ahead}" -gt 0 ] && insync=false
   [ "${behind}" -gt 0 ] && insync=false
+  [ "${hasremote}" -lt 1 ] && insync=false
 }
 
 # output the result for a specific repo
