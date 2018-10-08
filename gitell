@@ -2,6 +2,18 @@
 # author: deadc0de6 (https://github.com/deadc0de6)
 # Copyright (c) 2018, deadc0de6
 
+
+# print some debug
+#
+# $1: debug info
+debug()
+{
+  if [ "${debug}" = "yes" ]; then
+    echo -e "${c_debug}[DEBUG]${c_reset}${1}"
+  fi
+}
+
+
 # retrieve the branches
 # that are tracking a remote
 #
@@ -9,6 +21,7 @@
 # stores the list in ${branches}
 get_branches()
 {
+  debug "getting branches for \"${1}\""
   branches=""
   branches=$(git -C "${1}" for-each-ref "${git_head_path}" --format='%(refname:short)' | xargs)
   curbranch=$(git -C "${1}" symbolic-ref -q HEAD)
@@ -24,6 +37,7 @@ get_branches()
 # stores the string in ${status}
 get_status()
 {
+  debug "getting status for branch \"${2}\" in \"${1}\""
   nok=""
   status="${st_clean}"
   if [ "${2}" = "${3}" ]; then
@@ -37,7 +51,8 @@ get_status()
       fi
     done
     # check if need push
-    hasremote=$(git -C "${1}" ls-remote 2>/dev/null | grep -c "refs/heads/${2}")
+    hasremote=$(git -C "${1}" branch -vv 2>/dev/null | grep -c "^..${2}.*\\[origin/.*\\].*$")
+    debug "branch \"${2}\" - nb remote(s): ${hasremote}"
     if [ "${hasremote}" -gt 0 ]; then
       changes=$(git -C "${1}" cherry -v | wc -l)
       [ "${changes}" -gt "0" ] && nok="${nok}${st_push}${sep}"
@@ -57,13 +72,14 @@ get_status()
 # stores true|false in insync
 branch_status()
 {
+  debug "getting branch status \"${2}\" in \"${1}\""
   insync=true
   loc=${2}
   rem=$(git -C "${1}" config --get branch."${loc}".merge)
   cnts=$(git -C "${1}" rev-list --left-right --pretty=oneline --count "${loc}"..."${rem}")
   ahead=$(echo "${cnts}" | awk '{print $1}')
   behind=$(echo "${cnts}" | awk '{print $2}')
-  hasremote=$(git -C "${1}" ls-remote 2>/dev/null | grep -c "refs/heads/${2}")
+  hasremote=$(git -C "${1}" branch -vv 2>/dev/null | grep -c "^..${2}.*\\[origin/.*\\].*$")
   [ "${ahead}" -gt 0 ] && insync=false
   [ "${behind}" -gt 0 ] && insync=false
   [ "${hasremote}" -lt 1 ] && insync=false
@@ -92,6 +108,7 @@ c_green="\\e[32m"
 c_red="\\e[31m"
 c_magenta="\\e[35m"
 c_gray="\\e[37m"
+c_debug="\\e[43m"
 
 # status
 t_clean="clean"
@@ -110,21 +127,26 @@ paths="."
 depth="4"
 git_head_path="refs/heads"
 sep=","
+debug="no"
 
 # usage
-usage="\\n$(basename "${0}") [-vs] [-d <depth>] [<path> ...]"
+usage="\\n$(basename "${0}") [-vsD] [-d <depth>] [<path> ...]"
 usage="${usage}\\n"
 usage="${usage}\\n\\t-d <depth> \\tDepth to search for git directories (default: ${depth})."
 usage="${usage}\\n\\t-s\\t\\tUse symbols instead of text."
+usage="${usage}\\n\\t-D\\t\\tPrint debug information."
 usage="${usage}\\n\\t-h\\t\\tPrint usage."
 usage="${usage}\\n\\t-v\\t\\tPrint version."
 
 # parse arguments
-args="f:d:hvs"
+args="f:d:hvsD"
 while getopts ${args} arg; do
   case ${arg} in
     d)
       depth="${OPTARG}"
+      ;;
+    D)
+      debug="yes"
       ;;
     v)
       echo "$(basename "${0}") version ${version}"
