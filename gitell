@@ -9,7 +9,7 @@
 debug()
 {
   if [ "${debug}" = "yes" ]; then
-    echo -e "${c_debug}[DEBUG]${c_reset}${1}"
+    printf "${c_debug}[DEBUG]${c_reset}${1}\n"
   fi
 }
 
@@ -97,7 +97,7 @@ output()
   br="${c_gray}${2}${c_reset}"
   # if current branch, in white
   [ "${2}" = "${4}" ] && br="${2}"
-  echo -e "${c_blue}${1}${c_reset}/${br} ${3}"
+  printf "${c_blue}${1}${c_reset}/${br} ${3}\n"
 }
 
 # colors
