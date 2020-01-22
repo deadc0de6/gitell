@@ -33,11 +33,11 @@ gitell [-vs] [-d <depth>] [<path> ...]
 
 # Installation
 
-Clone the repository and copy `gitell` somewhere in your path.
+Download `gitell` and copy it somewhere in your path.
 
 ```
-git clone https://github.com/deadc0de6/gitell.git /tmp/gitell
-sudo cp /tmp/gitell/gitell /usr/bin/
+wget https://raw.githubusercontent.com/deadc0de6/gitell/master/gitell -O /tmp/gitell
+sudo cp /tmp/gitell /usr/bin/
 ```
 
 Gitell is also available on [aur](https://aur.archlinux.org/packages/gitell-git/): [gitell-git](https://aur.archlinux.org/packages/gitell-git/).
