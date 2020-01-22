@@ -35,9 +35,10 @@ gitell [-vs] [-d <depth>] [<path> ...]
 
 Download `gitell` and copy it somewhere in your path.
 
-```
-wget https://raw.githubusercontent.com/deadc0de6/gitell/master/gitell -O /tmp/gitell
-sudo cp /tmp/gitell /usr/bin/
+```bash
+$ wget https://raw.githubusercontent.com/deadc0de6/gitell/master/gitell -O /tmp/gitell
+$ chmod +x /tmp/gitell
+$ sudo cp /tmp/gitell /usr/bin/
 ```
 
 Gitell is also available on [aur](https://aur.archlinux.org/packages/gitell-git/): [gitell-git](https://aur.archlinux.org/packages/gitell-git/).
