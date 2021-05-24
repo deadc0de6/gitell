@@ -56,7 +56,7 @@ get_status()
     if [ "${hasremote}" -gt 0 ]; then
       changes=$(git -C "${1}" cherry -v | wc -l)
       [ "${changes}" -gt "0" ] && nok="${nok}${st_push}${sep}"
-      [ !  -z "${printremote}" ] && remote="$(git -C "${1}" config remote.origin.url) "
+      [ -n "${printremote}" ] && remote="$(git -C "${1}" config remote.origin.url) "
     fi
   fi
   branch_status "${1}" "${2}"
