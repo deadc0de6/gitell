@@ -8,7 +8,7 @@
 # $1: debug info
 debug()
 {
-  if [ "${debug}" = "yes" ]; then
+  if [ ! -z "${debug}" ]; then
     echo -e "[DEBUG] ${1}"
   fi
 }
@@ -56,6 +56,7 @@ get_status()
     if [ "${hasremote}" -gt 0 ]; then
       changes=$(git -C "${1}" cherry -v | wc -l)
       [ "${changes}" -gt "0" ] && nok="${nok}${st_push}${sep}"
+      [ !  -z "${printremote}" ] && remote="$(git -C "${1}" config remote.origin.url) "
     fi
   fi
   branch_status "${1}" "${2}"
@@ -88,16 +89,17 @@ branch_status()
 # output the result for a specific repo
 # on a specific branch
 #
-# $1: repo
-# $2: branch
-# $3: status
-# $4: current branch
+# $1: remote
+# $2: repo
+# $3: branch
+# $4: status
+# $5: current branch
 output()
 {
-  br="${c_gray}${2}${c_reset}"
+  br="${c_gray}${3}${c_reset}"
   # if current branch, in white
-  [ "${2}" = "${4}" ] && br="${2}"
-  echo -e "${c_blue}${1}${c_reset}/${br} ${3}"
+  [ "${3}" = "${5}" ] && br="${3}"
+  echo -e "${1}${c_blue}${2}${c_reset}/${br} ${4}"
 }
 
 # colors
@@ -133,31 +135,23 @@ paths="."
 depth="4"
 git_head_path="refs/heads"
 sep=","
-debug="no"
 
 # usage
-usage="\\n$(basename "${0}") [-vsD] [-d <depth>] [<path> ...]"
+usage="\\n$(basename "${0}") [-sDrv] [-d <depth>] [<path> ...]"
 usage="${usage}\\n"
 usage="${usage}\\n\\t-d <depth> \\tDepth to search for git directories (default: ${depth})."
 usage="${usage}\\n\\t-s\\t\\tUse symbols instead of text."
 usage="${usage}\\n\\t-D\\t\\tPrint debug information."
-usage="${usage}\\n\\t-h\\t\\tPrint usage."
+usage="${usage}\\n\\t-r\\t\\tPrint remotes."
 usage="${usage}\\n\\t-v\\t\\tPrint version."
+usage="${usage}\\n\\t-h\\t\\tPrint usage."
 
 # parse arguments
-args="f:d:hvsD"
+args="f:d:sDrvh"
 while getopts ${args} arg; do
   case ${arg} in
     d)
       depth="${OPTARG}"
-      ;;
-    D)
-      debug="yes"
-      ;;
-    v)
-      echo "$(basename "${0}") version ${version}"
-      echo "https://github.com/deadc0de6/gitell"
-      exit 0
       ;;
     s)
       t_clean="[✔]"
@@ -166,6 +160,17 @@ while getopts ${args} arg; do
       t_modified="+"
       t_sync="⌁"
       t_push="⇡"
+      ;;
+    D)
+      debug="true"
+      ;;
+    r)
+      printremote="true"
+      ;;
+    v)
+      echo "$(basename "${0}") version ${version}"
+      echo "https://github.com/deadc0de6/gitell"
+      exit 0
       ;;
     h)
       echo -e "${usage}" && exit 0
@@ -201,7 +206,7 @@ for path in ${paths}; do
     # loop through all branches
     for b in ${branches}; do
       get_status "${p}" "${b}" "${curbranch}"
-      output "${p}" "${b}" "${status}" "${curbranch}"
+      output "${remote}" "${p}" "${b}" "${status}" "${curbranch}"
     done
   done
 done
