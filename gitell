@@ -8,7 +8,7 @@
 # $1: debug info
 debug()
 {
-  if [ ! -z "${debug}" ]; then
+  if [ -n "${debug}" ]; then
     echo -e "[DEBUG] ${1}"
   fi
 }
