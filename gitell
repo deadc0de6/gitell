@@ -62,7 +62,7 @@ get_status()
   branch_status "${1}" "${2}"
   [ "${insync}" = false ] && nok="${nok}${st_sync}${sep}"
   # strip space
-  nok=${nok%%${sep}}
+  nok=${nok%%"${sep}"}
   [ "${nok}" != "" ] && status="${st_dirty} (${nok})"
 }
 
