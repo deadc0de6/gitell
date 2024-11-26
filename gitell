@@ -129,7 +129,7 @@ t_sync="not in sync"
 t_push="need push"
 
 # global vars
-version="0.6.1"
+version="0.7.0"
 gitsub=".git"
 paths="."
 depth="4"
@@ -193,6 +193,7 @@ st_push="${c_magenta}${t_push}${c_reset}"
 
 # loop through all paths
 for path in ${paths}; do
+  debug "exploring path arg \"${path}\""
   if [ ! -e "${path}" ]; then
     echo "[WARNING] \"${path}\" does not exist"
     continue
@@ -200,8 +201,12 @@ for path in ${paths}; do
   # loop through all git repositories
   find -L "${path}" -maxdepth "${depth}" -name "${gitsub}" -type d | while read -r g; do
     p=$(dirname "${g}")
+    debug "processing directory \"${p}\" (for \"${g}\")"
     # make sure we are in a git tree
-    git -C "${p}" rev-parse --is-inside-work-tree >/dev/null || continue
+    if ! git -C "${p}" rev-parse --is-inside-work-tree &>/dev/null; then
+      debug "skipping non-git directory \"${p}\""
+      continue
+    fi
     get_branches "${p}"
     # loop through all branches
     for b in ${branches}; do

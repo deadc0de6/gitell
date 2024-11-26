@@ -20,20 +20,22 @@ your gits are.
 Per default gitell will search for git repositories in the
 directory where it is called from.
 
-```
+```bash
 $ ./gitell -h
 
-gitell [-vs] [-d <depth>] [<path> ...]
+gitell [-sDrv] [-d <depth>] [<path> ...]
 
 	-d <depth> 	Depth to search for git directories (default: 4).
-	-s		Use symbols instead of text.
-	-h		Print usage.
-	-v		Print version.
+	-s		      Use symbols instead of text.
+	-D		      Print debug information.
+	-r		      Print remotes.
+	-v		      Print version.
+	-h		      Print usage.
 ```
 
 # Installation
 
-Download `gitell` and copy it somewhere in your path.
+Download `gitell` and copy it somewhere in your `$PATH`.
 
 ```bash
 $ wget https://raw.githubusercontent.com/deadc0de6/gitell/master/gitell -O /tmp/gitell
